@@ -1,0 +1,57 @@
+# backend
+venv/*
+commands.txt
+*.env
+backend/venv/*
+**/__pycache__/
+backend/logs/*.log
+*.xlsx
+*.sqlite3
+
+
+
+# frontend
+
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+frontend/Development/storage-manager/node_modules
+frontend/Development/storage-manager/.pnp
+frontend/Development/storage-manager/.pnp.*
+frontend/Development/storage-manager/.yarn/*
+frontend/Development/storage-manager/!.yarn/patches
+frontend/Development/storage-manager/!.yarn/plugins
+frontend/Development/storage-manager/!.yarn/releases
+frontend/Development/storage-manager/!.yarn/versions
+
+# testing
+frontend/Development/storage-manager/coverage
+
+# next.js
+frontend/Development/storage-manager/.next/
+frontend/Development/storage-manager/out/
+
+# production
+frontend/Development/storage-manager/build
+
+# misc
+frontend/Development/storage-manager/.DS_Store
+frontend/Development/storage-manager/*.pem
+
+# debug
+frontend/Development/storage-manager/npm-debug.log*
+frontend/Development/storage-manager/yarn-debug.log*
+frontend/Development/storage-manager/yarn-error.log*
+frontend/Development/storage-manager/.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+frontend/Development/storage-manager/.env*
+
+# vercel
+frontend/Development/storage-manager/.vercel
+
+# typescript
+frontend/Development/storage-manager/*.tsbuildinfo
+frontend/Development/storage-manager/next-env.d.ts
+
+frontend/Development/storage-manager/dev_commands.txt

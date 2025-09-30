@@ -1,0 +1,295 @@
+{
+    "config": {
+        "permissions_table_name": "Permissions",
+        "permissions_meta_table_name": "Meta_permissions",
+        "permissions_group_table_name": "Permissions_Group"
+    },
+    "tables": [
+        {
+            "name": "Authentications",
+            "fields": [
+                {
+                    "name": "ID",
+                    "type": "number"
+                },
+                {
+                    "name": "Token",
+                    "type": "string"
+                },
+                {
+                    "name": "Date_creation",
+                    "type": "string"
+                },
+                {
+                    "name": "Date expirate",
+                    "type": "string"
+                },
+                {
+                    "name": "ID_user",
+                    "type": "number"
+                }
+            ]
+        },
+        {
+            "name": "Permissions",
+            "fields": [
+                {
+                    "name": "ID",
+                    "type": "number"
+                },
+                {
+                    "name": "Permission_name",
+                    "type": "string"
+                },
+                {
+                    "name": "Permission_type",
+                    "type": "string"
+                },
+                {
+                    "name": "Details",
+                    "type": "string"
+                },
+                {
+                    "name": "ID_user_created_by",
+                    "type": "number"
+                }
+            ]
+        },
+        {
+            "name": "Permissions_Group",
+            "fields": [
+                {
+                    "name": "ID",
+                    "type": "number"
+                },
+                {
+                    "name": "Group_name",
+                    "type": "string"
+                },
+                {
+                    "name": "Group_description",
+                    "type": "string"
+                },
+                {
+                    "name": "ID_user_created_by",
+                    "type": "number"
+                }
+            ]
+        },
+        {
+            "name": "Meta_permissions",
+            "fields": [
+                {
+                    "name": "ID",
+                    "type": "number"
+                },
+                {
+                    "name": "ID_permission",
+                    "type": "number"
+                },
+                {
+                    "name": "ID_group",
+                    "type": "number"
+                },
+                {
+                    "name": "ID_user_created_by",
+                    "type": "number"
+                }
+            ]
+        },
+        {
+            "name": "Users",
+            "fields": [
+                {
+                    "name": "ID",
+                    "type": "number"
+                },
+                {
+                    "name": "Name",
+                    "type": "string"
+                },
+                {
+                    "name": "Date_creation",
+                    "type": "string"
+                },
+                {
+                    "name": "ID_access_token",
+                    "type": "number"
+                },
+                {
+                    "name": "ID_refresh_Token",
+                    "type": "number"
+                },
+                {
+                    "name": "ID_permission_group",
+                    "type": "number"
+                },
+                {
+                    "name": "User_type",
+                    "type": "string"
+                },
+                {
+                    "name": "Username",
+                    "type": "string"
+                },
+                {
+                    "name": "pw",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "User_ADMIN",
+            "fields": [
+                {
+                    "name": "ID",
+                    "type": "number"
+                },
+                {
+                    "name": "Name",
+                    "type": "string"
+                },
+                {
+                    "name": "Date_creation",
+                    "type": "string"
+                },
+                {
+                    "name": "email",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "User_cashier",
+            "fields": [
+                {
+                    "name": "ID",
+                    "type": "number"
+                },
+                {
+                    "name": "Name",
+                    "type": "string"
+                },
+                {
+                    "name": "Date_creation",
+                    "type": "string"
+                },
+                {
+                    "name": "email",
+                    "type": "string"
+                },
+                {
+                    "name": "Phone_number",
+                    "type": "number"
+                },
+                {
+                    "name": "DDD_number",
+                    "type": "number"
+                },
+                {
+                    "name": "Work_position",
+                    "type": "string"
+                },
+                {
+                    "name": "Leader_email",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "User_logistic",
+            "fields": [
+                {
+                    "name": "ID",
+                    "type": "number"
+                },
+                {
+                    "name": "Name",
+                    "type": "string"
+                },
+                {
+                    "name": "Date_creation",
+                    "type": "string"
+                },
+                {
+                    "name": "email",
+                    "type": "string"
+                },
+                {
+                    "name": "Phone_number",
+                    "type": "number"
+                },
+                {
+                    "name": "DDD_number",
+                    "type": "number"
+                },
+                {
+                    "name": "Work_position",
+                    "type": "string"
+                },
+                {
+                    "name": "Leader_email",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "Products",
+            "fields": [
+                {
+                    "name": "ID",
+                    "type": "number"
+                },
+                {
+                    "name": "Name",
+                    "type": "string"
+                },
+                {
+                    "name": "Details",
+                    "type": "string"
+                },
+                {
+                    "name": "ID_image",
+                    "type": "number"
+                },
+                {
+                    "name": "ID_storage",
+                    "type": "number"
+                },
+                {
+                    "name": "value",
+                    "type": "number"
+                },
+                {
+                    "name": "Token_product",
+                    "type": "string"
+                },
+                {
+                    "name": "Category",
+                    "type": "string"
+                },
+                {
+                    "name": "State",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "Images",
+            "fields": [
+                {
+                    "name": "ID",
+                    "type": "number"
+                },
+                {
+                    "name": "Name",
+                    "type": "string"
+                },
+                {
+                    "name": "content",
+                    "type": "bytes"
+                }
+            ]
+        }
+    ]
+}
