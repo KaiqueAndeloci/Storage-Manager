@@ -3,23 +3,50 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from Rotes.Authentication import index as authentication
 from DB.CRUD.index import SQLite
-import sys, os
+from pathlib import Path
+import sys, os, getpass
+from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+from time import time
+from datetime import datetime
 
-args = sys.argv
 
-print("Todos os argumentos:", args)
+load_dotenv()
 
-if len(sys.argv) > 1:
-    # print(f"Primeiro argumento: {sys.argv[1]}")
-    if sys.argv[1] == "create_user":
-        username = "" # input("")
-        password = "" # input("")
+BASE_DIR = Path(__file__).resolve().parent.parent
+CREATE_ROOT = os.getenv("create_root")
 
 db = SQLite('layout.json')
 db.Init_main()
 app = FastAPI()
 app.include_router(authentication.router)
 
+if CREATE_ROOT == 'True':
+    username = input("Username: ")
+    found = db.Read('Users', 'ID, Username', f" WHERE 'Username' = {username}")
+    if found == None:
+        name = input("Name: ")
+        password = getpass.getpass("Senha: ")
+        Date_creation = int(time()) #datetime.fromtimestamp(time()).strftime("%d/%m/%Y %H:%M:%S")
+        ID_Access = db.Create_item('')
+        db.Create_item('Users', "Name, Date_creation, ID_access_token, ID_refresh_Token, ID_permission_group, User_type, Username, pw",
+                         f"{name}, {Date_creation}, ID_access_token, ID_refresh_Token, ID_permission_group, ADMIN, {username}, {authentication.hash_password(password)}")
+        password = ""
+    else:
+        print("This user root already exist")
+
+origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"], # libera todos os métodos (GET, POST, etc.)
+    allow_headers=["*"], # libera todos os headers
+)
 
 @app.get("/", response_class=HTMLResponse)
 def read_root():

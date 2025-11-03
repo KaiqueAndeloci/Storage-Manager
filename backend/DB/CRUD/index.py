@@ -28,7 +28,7 @@ class SQLite():
             self.cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table';")
 
             DB_formated_table = self.cursor.fetchall()
-            self._Verify_permissions_table(DB_formated_table, layout_table['config']['permissions_table_name'])
+            #self._Verify_permissions_table(DB_formated_table, layout_table['config']['permissions_table_name'])
 
             if exists(f'{absolute_path.replace('DB\\CRUD', 'logs\\09-2025.log')}') == False:
                 pass
@@ -51,7 +51,7 @@ class SQLite():
 
         self.cursor.execute(f"SELECT * FROM {permissions_table_name};")
         db_permissions = self.cursor.fetchall()
-        
+
         # verificar as permissoes
         # for DB_table_name in DB_table:
         #     for line in db_permissions:
