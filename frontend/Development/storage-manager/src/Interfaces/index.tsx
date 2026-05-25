@@ -2,6 +2,12 @@ export type message_type = 'ERROR' | 'SUCCESS'
 
 export type permission_type = 'ADMIN' | 'cashier' | 'logistic'
 
+export interface chart_data_interface {
+    date: string,
+    desktop: number,
+    mobile: number
+}
+
 export interface user {
     name: string,
     email: string,

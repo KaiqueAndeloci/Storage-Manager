@@ -1,5 +1,19 @@
 {
     "config": {
+        "default_groups": [
+            {
+                "ID": 0,
+                "Group_name": "ADMIN",
+                "Group_description": "ADMIN's group by default",
+                "ID_user_created_by": 0
+            }
+        ],
+        "permissions_type": [
+            "CREATE",
+            "READ",
+            "UPDATE",
+            "DELETE"
+        ],
         "permissions_table_name": "Permissions",
         "permissions_meta_table_name": "Meta_permissions",
         "permissions_group_table_name": "Permissions_Group"
@@ -21,7 +35,7 @@
                     "type": "string"
                 },
                 {
-                    "name": "Date expirate",
+                    "name": "Date_expirate",
                     "type": "string"
                 },
                 {
@@ -92,6 +106,35 @@
                     "type": "number"
                 },
                 {
+                    "name": "Permission_type",
+                    "type": "string"
+                },
+                {
+                    "name": "Permission_name",
+                    "type": "string"
+                },
+                {
+                    "name": "ID_user_created_by",
+                    "type": "number"
+                }
+            ]
+        },
+        {
+            "name": "Meta_Group_Users",
+            "fields": [
+                {
+                    "name": "ID",
+                    "type": "number"
+                },
+                {
+                    "name": "ID_user",
+                    "type": "number"
+                },
+                {
+                    "name": "ID_group",
+                    "type": "number"
+                },
+                {
                     "name": "ID_user_created_by",
                     "type": "number"
                 }
@@ -121,10 +164,6 @@
                     "type": "number"
                 },
                 {
-                    "name": "ID_permission_group",
-                    "type": "number"
-                },
-                {
                     "name": "User_type",
                     "type": "string"
                 },
@@ -134,7 +173,7 @@
                 },
                 {
                     "name": "pw",
-                    "type": "string"
+                    "type": "bytes"
                 }
             ]
         },
@@ -143,6 +182,10 @@
             "fields": [
                 {
                     "name": "ID",
+                    "type": "number"
+                },
+                {
+                    "name": "id_user",
                     "type": "number"
                 },
                 {
@@ -164,6 +207,10 @@
             "fields": [
                 {
                     "name": "ID",
+                    "type": "number"
+                },
+                {
+                    "name": "id_user",
                     "type": "number"
                 },
                 {
@@ -201,6 +248,10 @@
             "fields": [
                 {
                     "name": "ID",
+                    "type": "number"
+                },
+                {
+                    "name": "id_user",
                     "type": "number"
                 },
                 {
@@ -270,6 +321,93 @@
                 },
                 {
                     "name": "State",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "Storages",
+            "fields": [
+                {
+                    "name": "ID",
+                    "type": "number"
+                },
+                {
+                    "name": "Name",
+                    "type": "string"
+                },
+                {
+                    "name": "Description",
+                    "type": "string"
+                },
+                {
+                    "name": "State",
+                    "type": "string"
+                },
+                {
+                    "name": "Items_count",
+                    "type": "number"
+                },
+                {
+                    "name": "Maximum_Size",
+                    "type": "number"
+                },
+                {
+                    "name": "Minimum_Size",
+                    "type": "number"
+                },
+                {
+                    "name": "Export_Storage_id",
+                    "type": "number"
+                },
+                {
+                    "name": "Import_Storage_id",
+                    "type": "number"
+                },
+                {
+                    "name": "Notify_id",
+                    "type": "number"
+                }
+            ]
+        },
+        {
+            "name": "Meta_Storages_Group",
+            "fields": [
+                {
+                    "name": "ID",
+                    "type": "number"
+                },
+                {
+                    "name": "ID_Storages",
+                    "type": "string"
+                },
+                {
+                    "name": "ID_group",
+                    "type": "number"
+                },
+                {
+                    "name": "ID_user_created_by",
+                    "type": "number"
+                }
+            ]
+        },
+        {
+            "name": "Notifications",
+            "fields": [
+                {
+                    "name": "ID",
+                    "type": "number"
+                },
+                {
+                    "name": "Title",
+                    "type": "string"
+                },
+                {
+                    "name": "Description",
+                    "type": "string"
+                },
+                {
+                    "name": "Type",
                     "type": "string"
                 }
             ]

@@ -1,14 +1,18 @@
+from Routes.Authentication import index as authentication
+from Routes.Users import index as users
+from Routes.Products import index as products
 from typing import Union
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
-from Rotes.Authentication import index as authentication
-from DB.CRUD.index import SQLite
+from DB.CRUD.index import db
 from pathlib import Path
-import sys, os, getpass
+import sys, os, getpass, uuid
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from time import time
-from datetime import datetime
+from datetime import datetime, timedelta
+from Routes.Users.index import User_ADMIN
+
 
 
 load_dotenv()
@@ -16,22 +20,33 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 CREATE_ROOT = os.getenv("create_root")
 
-db = SQLite('layout.json')
 db.Init_main()
 app = FastAPI()
 app.include_router(authentication.router)
+app.include_router(users.router)
+app.include_router(products.router)
+
+
 
 if CREATE_ROOT == 'True':
-    username = input("Username: ")
-    found = db.Read('Users', 'ID, Username', f" WHERE 'Username' = {username}")
-    if found == None:
-        name = input("Name: ")
-        password = getpass.getpass("Senha: ")
-        Date_creation = int(time()) #datetime.fromtimestamp(time()).strftime("%d/%m/%Y %H:%M:%S")
-        ID_Access = db.Create_item('')
-        db.Create_item('Users', "Name, Date_creation, ID_access_token, ID_refresh_Token, ID_permission_group, User_type, Username, pw",
-                         f"{name}, {Date_creation}, ID_access_token, ID_refresh_Token, ID_permission_group, ADMIN, {username}, {authentication.hash_password(password)}")
-        password = ""
+    username = input("\nUsername: ")
+    found = db.Read('Users', 'ID, Username', f" WHERE Username = '{username}'")
+
+    if found == None or len(found) == 0:
+        name = input("\nName: ")
+        email = input("\nEmail: ")
+        # password = authentication.hash_password("kaique123") 
+        password = authentication.hash_password(getpass.getpass("\nSenha: "))
+        today = int(time())
+        Date_creation = int(time())
+        access = f"{str(uuid.uuid4())}"
+        refresh = f"{str(uuid.uuid4())}"
+        data_futura = datetime.now() + timedelta(days=30)
+        expirate = int(data_futura.timestamp())
+        user = User_ADMIN(Name=name, email=email)
+        users.create_user("ADMIN", username, password, user)
+        print("User created!")
+        password = None
     else:
         print("This user root already exist")
 

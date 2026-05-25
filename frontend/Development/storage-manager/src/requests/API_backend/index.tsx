@@ -2,6 +2,7 @@
 import { formResponse } from '@/interfaces/index'
 import { NextResponse } from "next/server";
 import { cookies } from 'next/headers';
+import { isKeyObject } from 'util/types';
 
 
 const URL_BASE = 'http://127.0.0.1:8001'
@@ -50,18 +51,25 @@ export async function requestAPI({ url, body, method, token = undefined }: { url
 
 export async function loginAction({ user, password }: { user: string, password: string }):
     Promise<formResponse> {
-    const request = await requestAPI({
-        url: `${URL_BASE}/authentication/token/refresh`,
-        body: { 'username': user, 'password': password }, method: 'POST'
+    let request = await requestAPI({
+        url: `${URL_BASE}/authentication/token`,
+        body: { 'username': user, 'pw': password }, method: 'POST'
     })
 
-    if (true) {
+    if (request.response_api.access != undefined && request.response_api.access != null) {
+        request = await requestAPI({
+            url: `${URL_BASE}/users/me`,
+            method: 'GET',
+            token: request.response_api.access
+        })
+    }
+    if (request.response_api.access != undefined && request.response_api.access != null) {
         const maxAge1 = 60 * 60 * 24 * 29; // 29 dias
         const maxAge2 = 60 * 4; // 4 min
 
         (await cookies()).set({
-            name: 'user_name',
-            value: `Kaique`,
+            name: 'Name',
+            value: request.response_api.Name,
             httpOnly: true,
             secure: true,
             sameSite: 'strict',
@@ -70,7 +78,7 @@ export async function loginAction({ user, password }: { user: string, password: 
         });
         (await cookies()).set({
             name: 'user_email',
-            value: `kaique.andeloci@hotmail.com`,
+            value: request.response_api.email,
             httpOnly: true,
             secure: true,
             sameSite: 'strict',
@@ -79,7 +87,7 @@ export async function loginAction({ user, password }: { user: string, password: 
         });
         (await cookies()).set({
             name: 'user_permission',
-            value: `ADMIN`,
+            value: request.response_api.User_type,
             httpOnly: true,
             secure: true,
             sameSite: 'strict',
@@ -87,8 +95,8 @@ export async function loginAction({ user, password }: { user: string, password: 
             maxAge: maxAge1,
         });
         (await cookies()).set({
-            name: 'date_creation',
-            value: `10-10-2025`,
+            name: 'Date_creation',
+            value: request.response_api.Date_creation,
             httpOnly: true,
             secure: true,
             sameSite: 'strict',
