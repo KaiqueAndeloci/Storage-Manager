@@ -14,6 +14,8 @@ class SQLite():
             self.conn = DB.connect(database=path)
             self.cursor = self.conn.cursor()
             DB_table = self.Read("sqlite_master", "name", " WHERE type = 'table'")
+            if DB_table == None:
+                DB_table = []
 
             with open(f'{absolute_path.replace('DB\\CRUD', '')}{self.layout_filename}', "r", encoding="utf-8") as arquivo:
                 layout_table = json.load(arquivo)
@@ -31,8 +33,8 @@ class SQLite():
             # verify the names of columns or tables
 
             # verify the table permissions items
-            DB_formated_table = self.Read("sqlite_master", "name", " WHERE type='table'")
-            self._Verify_permissions_table(DB_formated_table, layout_table['config'])
+            DB_table = self.Read("sqlite_master", "name", " WHERE type='table'")
+            self._Verify_permissions_table(DB_table, layout_table['config'])
 
             # verify if the log folder exists
             if exists(f'{absolute_path.replace('DB\\CRUD', 'logs\\09-2025.log')}') == False:
@@ -42,7 +44,7 @@ class SQLite():
             self._Verify_groups(layout_table['config'])
 
         except Exception as err:
-            print(err)
+            print(err, "\n")
 
     def _Verify_permissions_table(self, DB_table: list, layout_config: object):
         table_exists = False
@@ -56,6 +58,8 @@ class SQLite():
             Exception("bad layout")
 
         db_permissions = self.Read(layout_config['permissions_table_name'], "ID, Permission_name, Permission_type, Details, ID_user_created_by")
+        if db_permissions == None:
+            db_permissions = []
 
         # verificar as permissoes
         for DB_table_name in DB_table:
@@ -148,6 +152,8 @@ class SQLite():
     def _Verify_groups(self, layout_config: object):
         table_group_name = self._Format_string(layout_config['permissions_group_table_name'])
         groups = self.Read(table_group_name, "ID, Group_name, Group_description, ID_user_created_by")
+        if groups == None:
+            groups = []
         found = False
 
         if len(groups) > 0:
@@ -164,7 +170,13 @@ class SQLite():
                                        "ID, ID_permission, ID_group, Permission_type, Permission_name, ID_user_created_by", 
                                        f" WHERE ID_group = 1")
 
+        if permissions_groups == None:
+            permissions_groups = []
+
         permissions_table = self.Read(layout_config['permissions_table_name'], "ID, Permission_name, Permission_type, Details, ID_user_created_by")
+
+        if permissions_table == None:
+            permissions_table = []
 
         if len(permissions_groups) == 0:
             for permission in permissions_table:
@@ -178,7 +190,6 @@ class SQLite():
     def Read(self, table: str, column: str, filter: str = "") -> None | list:
         try:
             self.cursor.execute(f'select {column} from {table}{filter};')
-            
             # self.cursor.execute("SELECT ? FROM ? ?;", (column, table, filter))
             items = []
             for row in self.cursor.fetchall():
@@ -255,11 +266,16 @@ class SQLite():
             print("Create table error")
             print(err)
 
-    def Delete(self, data):
+    def Delete(self, table: str, filter: str = "") -> bool:
+        """exemple: DELETE FROM "Table1" WHERE ID = 1"""
         try:
-            pass
+            self.cursor.execute(f"DELETE FROM {table}{filter};")
+            self.Commit()
+            return True
         except Exception as err:
+            print("Update error")
             print(err)
+            return False
 
     def Commit(self):
         try:

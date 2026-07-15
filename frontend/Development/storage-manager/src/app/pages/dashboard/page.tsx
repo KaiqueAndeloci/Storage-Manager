@@ -1,5 +1,57 @@
 'use server'
 import { Chart } from "@/components/charts/chart_line";
+// import { ProductsChart } from "@/components/charts/chart_test"
+import { Suspense } from "react";
+import Loading from '@/app/loading'
+
+const chartData2 = [
+    {
+        "ID": 1,
+        "Name": "Product1",
+        "Details": "This is the Details of Product1",
+        "ID_image": 1,
+        "ID_storage": 1,
+        "value": 1,
+        "Token_product": "123",
+        "Category": "categoria1",
+        "State": "Inativo"
+    },
+    {
+        "ID": 2,
+        "Name": "Product2",
+        "Details": "This is the Details of Product2",
+        "ID_image": 1,
+        "ID_storage": 1,
+        "value": 2,
+        "Token_product": "123",
+        "Category": "categoria2",
+        "State": "Ativo"
+    },
+    {
+        "ID": 3,
+        "Name": "Product3",
+        "Details": "This is the Details of Product2",
+        "ID_image": 1,
+        "ID_storage": 1,
+        "value": 1,
+        "Token_product": "123",
+        "Category": "categoria1",
+        "State": "Inativo"
+    },
+    {
+        "ID": 4,
+        "Name": "Product4",
+        "Details": "This is the Details of Product2",
+        "ID_image": 1,
+        "ID_storage": 1,
+        "value": 4,
+        "Token_product": "123",
+        "Category": "categoria1",
+        "State": "Ativo"
+    }
+]
+
+
 
 const chartData = [
     { date: "2024-04-01", desktop: 222, mobile: 150 },
@@ -96,10 +148,20 @@ const chartData = [
 ]
 
 export default async function Dashboard() {
+    const formated = () => {
+        for (let index = 0; index < chartData2.length; index++) {
+            const element = chartData2[index];
+
+        }
+    }
+
+
     return (
         <div>
-            <p>dashboard page</p>
-            <Chart chart_data={chartData}></Chart>
+            <Suspense fallback={<Loading></Loading>}>
+                <p>dashboard page</p>
+                <Chart data={chartData}></Chart>
+            </Suspense>
         </div>
     )
 }

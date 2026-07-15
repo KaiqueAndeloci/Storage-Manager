@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Response, Depends
+from fastapi import APIRouter, Response, Depends, Query
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.security import HTTPAuthorizationCredentials
 from DB.CRUD.index import db
@@ -11,6 +11,7 @@ from enum import Enum
 from Routes.Authentication import index as authentication
 from Interfaces.index import *
 from fastapi.security import HTTPBearer
+from typing import Annotated
 
 security = HTTPBearer()
 
@@ -40,31 +41,38 @@ def verify_token(credentials: str | None):
 def verify_permission(token: str, action_type: str, name_permission: str):
     autorized = False
     tokens = db.Read("Authentications", "ID, Token, Date_expirate, ID_user", f" WHERE Token = '{token}'")
+    if tokens == None:
+        tokens = []
 
-    if tokens != None:
-        if len(tokens) > 0:
-            today = int(time.time())
 
-            for token in tokens:
-                if token[2] > today:
-                    groups = db.Read("Meta_Group_Users", "ID, ID_user, ID_group",
-                                    f" WHERE ID_user = {tokens[3]}")
+    if len(tokens) > 0:
+        today = int(time.time())
 
-                    for group in groups:
-                        permissions = db.Read("Meta_permissions", 
-                                            "ID, ID_permission, ID_group, Permission_type, Permission_name, ID_user_created_by", 
-                                            f" WHERE ID_group = {group[2]} && Permission_type = '{action_type}' && Permission_name = '{name_permission}'")
+        for token in tokens:
+            if int(token[2]) > today:
+                groups = db.Read("Meta_Group_Users", "ID, ID_user, ID_group",
+                                f" WHERE ID_user = {token[3]}")
+                if groups == None:
+                    groups = []
 
-                        if len(permissions) > 0:
-                            autorized = True
+                for group in groups:
+                    permissions = db.Read("Meta_permissions", 
+                                        "ID, ID_permission, ID_group, Permission_type, Permission_name, ID_user_created_by", 
+                                        f" WHERE ID_group = {group[2]} AND Permission_type = '{action_type}' AND Permission_name = '{name_permission}'")
 
-                            break
+                    if permissions == None:
+                        permissions = []
 
-                    break
+                    if len(permissions) > 0:
+                        autorized = True
+
+                        break
+
+                break
 
     return autorized
 
-def create_user(User_type: User_Types, Username: str, pw: str, user_object: User_cashier | User_logistic | User_ADMIN):
+def create_user(Username: str, pw: str, user_object: Union[AdminUser, CashierUser, LogisticUser] = Field(discriminator="UserType")):
     Date_creation = int(time.time())
     access = f"{str(uuid.uuid4())}"
     refresh = f"{str(uuid.uuid4())}"
@@ -79,7 +87,7 @@ def create_user(User_type: User_Types, Username: str, pw: str, user_object: User
                                 [refresh, today, expirate, 0])
 
     id_user = db.Create_item('Users', "Name, Date_creation, ID_access_token, ID_refresh_Token, User_type, Username, pw",
-                             [user_object.Name, Date_creation, ID_access, ID_refresh, User_type, Username, pw])
+                             [user_object.Name, Date_creation, ID_access, ID_refresh, user_object.UserType, Username, pw])
 
     if id_user != None:
         db.Update("Authentications", ["Token", "Date_creation", 'Date_expirate', "ID_user"], 
@@ -88,20 +96,20 @@ def create_user(User_type: User_Types, Username: str, pw: str, user_object: User
         db.Update("Authentications",  ["Token", "Date_creation", 'Date_expirate', "ID_user"], 
                   [refresh, today, expirate, id_user], f"WHERE ID = {ID_refresh}")
 
-        if User_type == "ADMIN":
+        if user_object.UserType == "ADMIN":
             id_user = db.Create_item('User_ADMIN', 
                             "id_user, Name, Date_creation, email",
-                            [id_user, user_object.Name, Date_creation, user_object.email])
-        elif User_type == "cashier":
+                            [id_user, user_object.Name, Date_creation, user_object.Email])
+        elif user_object.UserType == "cashier":
             id_user = db.Create_item('User_cashier', 
                             "id_user, Name, Date_creation, email, Phone_number, DDD_number, Work_position, Leader_email",
-                            [id_user, user_object.Name, Date_creation, user_object.email, user_object.Phone_number, 
-                             user_object.DDD_number, user_object.Work_position, user_object.Leader_email])
-        elif User_type == "logistic":
-            id_user = db.Create_item('User_cashier', 
+                            [id_user, user_object.Name, Date_creation, user_object.Email, user_object.PhoneNumber, 
+                             user_object.DDDNumber, user_object.WorkPosition, user_object.LeaderEmail])
+        elif user_object.UserType == "logistic":
+            id_user = db.Create_item('User_logistic', 
                             "id_user, Name, Date_creation, email, Phone_number, DDD_number, Work_position, Leader_email",
-                            [id_user, user_object.Name, Date_creation, user_object.email, user_object.Phone_number, 
-                             user_object.DDD_number, user_object.Work_position, user_object.Leader_email])
+                            [id_user, user_object.Name, Date_creation, user_object.Email, user_object.PhoneNumber, 
+                             user_object.DDDNumber, user_object.WorkPosition, user_object.LeaderEmail])
 
     return id_user
 
@@ -122,50 +130,122 @@ def find_user_type(user_objct: list, user_type: User_Types) -> None | list:
                         f" WHERE id_user = {user_objct[0]}")
     return user_return
 
-@router.post("/")
-async def post_user(user: PostUser):
-    permission = verify_permission(user.token, 'CREATE', 'Users')
+@router.post("", response_model=int | None)
+async def post_user(user: PostUser, credentials: HTTPAuthorizationCredentials = Depends(security)):
+    try:
+        users_found = verify_token(credentials.credentials)
+        if users_found == None:
+            users_found = []
 
-    if permission == False:
-        return Response(content={"message": "Unauthorized"}, status_code=401)
+        if len(users_found) == 0:
+            return JSONResponse(content={"message": "Bad request"}, status_code=400)
 
-    users = db.Read("Users", "ID", f" WHERE Username = '{user.username}'")
+        permission = verify_permission(credentials.credentials, 'CREATE', 'Users')
 
-    if len(users) > 0:
-        return Response(content={"message": "This username is already in use"}, status_code=400)
+        if permission == False:
+            return JSONResponse(content={"message": "Unauthorized"}, status_code=401)
 
-    id_user = create_user(user.name, user.user_type, user.username, authentication.hash_password(user.pw))
+        found = db.Read('Users', 'ID, Username', f" WHERE Username = '{user.User.Username}'")
 
-    if id_user == None:
-        return Response(content={"message": "Bad request"}, status_code=400)
+        if found == None:
+            found = []
 
-    return Response(content={"id_user": id_user}, status_code=200)
+        User_created = None
 
-@router.get("/")
-async def get_user(user: GetUser):
-    permission = verify_permission(user.token, 'READ', 'Users')
+        if len(found) == 0:
+            password = authentication.hash_password(user.User.PW)
 
-    if permission == False:
-        return Response(content={"message": "Unauthorized"}, status_code=401)
+            User_created = create_user(user.User.Username, password, user.User)
+            password = None
 
-    users = []
+        if User_created != None:
+            return JSONResponse(content={"User_created": User_created}, status_code=200)
 
-    if user.user_id != None:
+        return JSONResponse(content={"message": "Bad request"}, status_code=500)
+    except Exception as error:
+        print(error)
+        return JSONResponse(content={"message": "Bad request"}, status_code=500)
+
+@router.get("", response_model=ResponseGetUsers | None)
+async def get_user(filter_query: Annotated[GetUsers, Query()], credentials: HTTPAuthorizationCredentials = Depends(security)):
+    try:
+        users = verify_token(credentials.credentials)
+        if users == None:
+            users = []
+
+        if len(users) == 0:
+            return JSONResponse(content={"message": "Bad request"}, status_code=400)
+
+        permission = verify_permission(credentials.credentials, 'READ', 'Users')
+
+        if permission == False:
+            return JSONResponse(content={"message": "Unauthorized"}, status_code=401)
+
+        users = []
+
+        filter1 = []
+        filter2 = f"ORDER BY {filter_query.OrderBy} ASC LIMIT {filter_query.Limit} OFFSET {filter_query.Offset}"
+        filter3 = ""
+
+        if filter_query.UserType != None:
+            filter1.append(f"User_type = '{filter_query.UserType[0:]}'")
+
+        if filter_query.Name != None:
+            filter1.append(f"Name = '{filter_query.Name}'")
+
+        if filter_query.DateCreation != None:
+            filter1.append(f"Date_creation = '{filter_query.DateCreation}'")
+
+        if len(filter1) > 0:
+            filter3 = f" WHERE "
+
+            for index, filter in enumerate(filter1):
+                if index > 0:
+                    filter3 += f" And "
+
+                filter3 += f"{filter}"
+
         users = db.Read("Users", 
-                        "ID, Name, Date_creation, ID_access_token, ID_refresh_Token, User_type, Username, pw", 
-                        f" WHERE ID = {user.user_id}")
-    elif user.name != None:
-        users = db.Read("Users", 
-                        "ID, Name, Date_creation, ID_access_token, ID_refresh_Token, User_type, Username, pw", 
-                        f" WHERE Name = {user.name}")
-    elif user.username != None:
-        users = db.Read("Users", 
-                        "ID, Name, Date_creation, ID_access_token, ID_refresh_Token, User_type, Username, pw", 
-                        f" WHERE Username = {user.username}")
-    else:
-        return Response(content={"message": "Bad request"}, status_code=400)
+                            "Name, Date_creation, User_type", 
+                            f"{filter3} {filter2}")
+        total = db.Read("Users", "COUNT(*)", f"{filter3}")
 
-    return Response(content={"users": users}, status_code=200)
+        if users == None:
+            users = []
+            response = {
+                "Users": users,
+                "Total": 0,
+                "Limit": int(filter_query.Limit),
+                "Offset": int(filter_query.Offset),
+            }
+            return JSONResponse(content=response, status_code=200)
+
+        if len(users) > 0:
+            users_copy = users
+            users = []
+            for item in users_copy:
+                users.append({
+                    "Name": item[0],
+                    "DateCreation": item[1],
+                    "UserType": item[2]
+                })
+
+        if total == None:
+            total = 0
+        else:
+            total = total[0][0]
+
+        response = {
+            "Users": users,
+            "Total": int(total),
+            "Limit": int(filter_query.Limit),
+            "Offset": int(filter_query.Offset),
+        }
+
+        return JSONResponse(content=response, status_code=200)
+    except Exception as error:
+        print(error)
+        return JSONResponse(content={"message": "Bad request"}, status_code=500)
 
 @router.patch("/")
 async def patch_user():
@@ -185,25 +265,25 @@ async def delete_user():
         "message": "ok"
     }
 
-@router.get("/me", response_model=ResponseUser,  response_model_exclude=["ID", "username"])
+@router.get("/me", response_model=ResponseMe,  response_model_exclude=["ID", "username"])
 async def get_me(credentials: HTTPAuthorizationCredentials = Depends(security)):
     try:
         users = verify_token(credentials.credentials)
+
         if users != None:
             if len(users) > 0:
                 access, refresh = authentication.get_tokens(users[0])
-                
+
                 specific_user = find_user_type(users[0], users[0][5])
-                formated = str(datetime.fromtimestamp(float(users[0][2])).strftime("%d/%m/%Y")) #"%d%d/%m%m/%Y%Y%Y%Y"
-                
-                
+                formated = str(datetime.fromtimestamp(float(users[0][2])).strftime("%d/%m/%Y"))
+
                 return JSONResponse(content=
                     {
-                        "Name": users[0][0],
-                        "Date_creation": formated,
+                        "Name": users[0][1],
+                        "DateCreation": formated,
                         "access": access,
                         "refresh": refresh,
-                        "User_type": users[0][5],
+                        "UserType": users[0][5],
                         "email": specific_user[0][4]
                     }, 
                     status_code=200)

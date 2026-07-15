@@ -5,7 +5,7 @@ import { useFormStatus } from "react-dom";
 import { cn } from "@/lib/utils"
 
 
-export function ButtonSubmit({ text, className, size }: { text?: string, className?: string, size?: "default" | "sm" | "lg" | "icon" | "xl" | null }) {
+export function ButtonSubmit({ text, className, size }: { text?: string, className?: string, size?: "default" | "sm" | "lg" | "icon" | "xs" | "icon-xs" | "icon-sm" | "icon-lg" | null | undefined }) {
     const { pending } = useFormStatus()
     return (
         <Button size={size} className={className} disabled={pending} type='submit'>

@@ -1,24 +1,19 @@
 'use client'
 import React, { createContext, useContext, useState, useEffect, use } from 'react';
-import { AuthenticateContext, user, permission_type } from "@/interfaces/index"
+import { AuthenticateContext, user, permission_type, page } from "@/Interfaces/index"
 // import { usePathname } from 'next/navigation'
 // import routes from '@/app/routes'
 // import { logoutAction, loginAction } from '@/requests/API_backend';
 
 
 const AuthContext = createContext<AuthenticateContext>({
-    user_credentials: undefined,
-    page_details: undefined,
-    login: async (
-        name: string,
-        email: string,
-        userPermission: permission_type
-    ) => {
-    },
+    user_details: undefined,
+    setPage: async (page: page) => { },
     logout: async () => { }
 })
 
 export const AuthProvider = ({ children, user }: { children: React.ReactNode, user: user | undefined; }) => {
+    const [pageState, setPageState] = useState<page | undefined>(undefined)
     // const [userState, setUser] = useState<user | undefined>(undefined)
     // const protectedRoutes = [routes.pages]
     // const loginPage = [routes.login]
@@ -49,6 +44,9 @@ export const AuthProvider = ({ children, user }: { children: React.ReactNode, us
     //         date_creation: "getCookie('date_creation')"
     //     }
     // }
+    async function setPage() {
+
+    }
 
     async function login(name: string, email: string, userPermission: permission_type) {
 
@@ -67,8 +65,9 @@ export const AuthProvider = ({ children, user }: { children: React.ReactNode, us
 
     return (
         <AuthContext.Provider value={{
-            user_credentials: user,
-            login,
+            user_details: user,
+            page: pageState,
+            setPage: setPageState,
             logout,
         }}>
             {children}

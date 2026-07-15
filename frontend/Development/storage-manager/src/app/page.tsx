@@ -3,7 +3,7 @@ import { ButtonSubmit } from "@/components/custom/button";
 // import { useSearchParams } from 'next/navigation'
 import routes from '@/app/routes'
 // import { redirect } from 'next/navigation'
-import Link from "next/link"
+// import Link from "next/link"
 
 
 export default async function Home() {

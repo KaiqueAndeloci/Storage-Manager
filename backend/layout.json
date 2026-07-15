@@ -135,7 +135,7 @@
                     "type": "number"
                 },
                 {
-                    "name": "ID_user_created_by",
+                    "name": "ID_user_added_by",
                     "type": "number"
                 }
             ]

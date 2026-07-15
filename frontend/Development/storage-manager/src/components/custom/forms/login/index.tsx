@@ -4,7 +4,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from '@/components/ui/label';
 import { Suspense, use, useState } from "react";
 import { loginAction } from '@/requests/API_backend/index'
-import { useAuth } from "@/providers";
+import { useAuth } from "@/Providers";
 import { Notify } from "@/components/custom/notification/index";
 import { ButtonSubmit } from "@/components/custom/button";
 import { redirect } from 'next/navigation'
@@ -42,8 +42,8 @@ export function LoginForm() {
 
     return (
         <form action={handleLogin} className="text-white flex flex-col gap-3 min-w-sm mr-6 ml-6 sm:mr-16 sm:ml-16 md:mr-24 md:ml-24 lg:mr-auto lg:ml-auto lg:w-lg">
-            <Input maxLength={64} name={'username'} type="text" placeholder="Username" />
-            <Input maxLength={64} name={'password'} type={show ? 'text' : 'password'} placeholder="Password" />
+            <Input className="text-white" maxLength={64} name={'username'} type="text" placeholder="Username" />
+            <Input className="text-white" maxLength={64} name={'password'} type={show ? 'text' : 'password'} placeholder="Password" />
             <div className="w-full flex gap-4">
                 <Checkbox onCheckedChange={() => { setShow(!show) }} id="pass"></Checkbox>
                 <Label htmlFor="pass" className="text-white">Show password</Label>

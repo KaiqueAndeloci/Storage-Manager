@@ -1,6 +1,7 @@
 from Routes.Authentication import index as authentication
 from Routes.Users import index as users
 from Routes.Products import index as products
+from Routes.Groups import index as groups
 from typing import Union
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
@@ -11,20 +12,22 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from time import time
 from datetime import datetime, timedelta
-from Routes.Users.index import User_ADMIN
-
+from Interfaces.index import PostUser, AdminUser
+import uvicorn
 
 
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 CREATE_ROOT = os.getenv("create_root")
+DEBUG = os.getenv("debug")
 
 db.Init_main()
 app = FastAPI()
 app.include_router(authentication.router)
 app.include_router(users.router)
 app.include_router(products.router)
+app.include_router(groups.router)
 
 
 
@@ -32,20 +35,17 @@ if CREATE_ROOT == 'True':
     username = input("\nUsername: ")
     found = db.Read('Users', 'ID, Username', f" WHERE Username = '{username}'")
 
-    if found == None or len(found) == 0:
+    if found == None:
+        found = []
+
+    if len(found) == 0:
         name = input("\nName: ")
         email = input("\nEmail: ")
-        # password = authentication.hash_password("kaique123") 
         password = authentication.hash_password(getpass.getpass("\nSenha: "))
-        today = int(time())
-        Date_creation = int(time())
-        access = f"{str(uuid.uuid4())}"
-        refresh = f"{str(uuid.uuid4())}"
-        data_futura = datetime.now() + timedelta(days=30)
-        expirate = int(data_futura.timestamp())
-        user = User_ADMIN(Name=name, email=email)
-        users.create_user("ADMIN", username, password, user)
+        user = AdminUser(Name=name, UserType='ADMIN', Email=email, Username=username, PW=password, IDUser=0)
+        ID_user = users.create_user(username, password, PostUser(User=user))
         print("User created!")
+        groups.add_user_on_group(ID_user, 1, 0)
         password = None
     else:
         print("This user root already exist")
@@ -69,3 +69,7 @@ def read_root():
         html_texto = f.read()
 
     return html_texto
+
+# debug mode:
+if DEBUG == 'True':
+    uvicorn.run(app, host="0.0.0.0", port=8000)

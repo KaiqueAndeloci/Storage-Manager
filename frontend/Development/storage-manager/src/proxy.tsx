@@ -3,11 +3,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import routes from '@/app/routes'
 
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
     const protectedRoutes = [routes.pages]
     const loginPage = [routes.login]
+    const adminPage = [routes.management]
     const { pathname } = request.nextUrl
     const user = request.cookies.get('user_email')?.value
+    const user_type = request.cookies.get('user_permission')?.value
 
     const isProtected = protectedRoutes.some(route =>
         pathname.includes(route)
@@ -27,6 +29,11 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL(routes.dashboard, request.url))
     }
 
+    const isAdminPage = adminPage.some(route => pathname.includes(route))
+
+    if (user_type != 'ADMIN' && isAdminPage) {
+        return NextResponse.redirect(new URL(routes.dashboard, request.url))
+    }
 
     return NextResponse.next()
 }

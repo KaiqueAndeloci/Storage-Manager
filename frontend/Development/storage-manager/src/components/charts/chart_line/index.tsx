@@ -23,7 +23,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { chart_data_interface } from '@/interfaces'
+import { chart_data_interface2 } from '@/Interfaces'
 
 
 export const description = "An interactive area chart"
@@ -42,10 +42,10 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-export function Chart({ chart_data }: { chart_data: chart_data_interface[] }) {
+export function Chart({ data }: { data: chart_data_interface2[] }) {
     const [timeRange, setTimeRange] = React.useState("90d")
 
-    const filteredData = chart_data.filter((item) => {
+    const filteredData = data.filter((item) => {
         const date = new Date(item.date)
         const referenceDate = new Date("2024-06-30")
         let daysToSubtract = 90

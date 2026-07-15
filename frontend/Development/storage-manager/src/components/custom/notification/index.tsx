@@ -3,7 +3,7 @@ import { CircleX } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
-import { message_type } from "@/interfaces/index"
+import { message_type } from "@/Interfaces/index"
 
 
 export function Notify({ message, message_type }: { message: string, message_type: message_type }) {
