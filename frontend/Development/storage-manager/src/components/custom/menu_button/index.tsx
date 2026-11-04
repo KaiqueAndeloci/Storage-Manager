@@ -1,7 +1,7 @@
 'use client'
 import { useSearchParams } from 'next/navigation'
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import routes from '@/app/routes'
+import { routes } from '@/app/routes'
 import { useAuth } from '@/Providers'
 
 export function MenuButton() {
@@ -11,7 +11,7 @@ export function MenuButton() {
 
     if (authenticated.user_details) {
         return (
-            <div className={`h-full justify-center content-center `}>
+            <div className={`h-full justify-center content-center p-3`}>
                 <SidebarTrigger className="text-white hover:bg-[#005FB8] hover:opacity-80 hover:text-white" />
             </div>
         )

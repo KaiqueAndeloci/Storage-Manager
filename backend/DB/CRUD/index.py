@@ -207,7 +207,7 @@ class SQLite():
             print('\n')
             return None
 
-    def Update(self, table: str, column:list, value: list, filter: str = ""):
+    def Update(self, table: str, column:list, value: list, filter: str = "") -> bool:
         """exemple: UPDATE "Table1" SET (column1 = 'a', column2 = 2, column3 = 'b', ...) WHERE ID = 1"""
         try:
             # self.cursor.execute(f"UPDATE {table} SET {value}{filter};")
@@ -220,9 +220,11 @@ class SQLite():
 
             self.cursor.execute(f"UPDATE {table} SET {placeholders} {filter};", formated)
             self.Commit()
+            return True
         except Exception as err:
             print("Update error")
             print(err)
+            return False
 
     def Create_item(self, table:str, column:str, value:list, filter: str = ""):
         """exemple: INSERT INTO "Table1" (x, y, z, ...) VALUES ('a', 2, 'b', ...)"""
@@ -235,7 +237,7 @@ class SQLite():
             for i in range(len(formated)-1):
                 placeholders += f", ?" 
 
-            self.cursor.execute(f"INSERT INTO {table} ({column}) VALUES ({placeholders}) {filter};", formated)
+            self.cursor.execute(f"INSERT INTO {table} ({column}) VALUES ({placeholders}){filter};", formated)
 
             self.Commit()
             return self.cursor.lastrowid
@@ -243,6 +245,7 @@ class SQLite():
             print(table, column, value)
             print("Create error")
             print(err)
+            return None
 
     def Create_Table(self, table_name:str, columns:str):
         """exemple: CREATE TABLE "Table1" (id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT NOT NULL, ...)"""
@@ -273,7 +276,7 @@ class SQLite():
             self.Commit()
             return True
         except Exception as err:
-            print("Update error")
+            print("Delete error")
             print(err)
             return False
 

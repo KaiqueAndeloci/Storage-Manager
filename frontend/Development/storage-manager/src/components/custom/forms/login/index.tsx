@@ -9,7 +9,7 @@ import { Notify } from "@/components/custom/notification/index";
 import { ButtonSubmit } from "@/components/custom/button";
 import { redirect } from 'next/navigation'
 import { useSearchParams } from 'next/navigation'
-import routes from '@/app/routes'
+import { routes } from '@/app/routes'
 
 
 export function LoginForm() {

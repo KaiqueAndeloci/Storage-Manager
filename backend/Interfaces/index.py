@@ -12,6 +12,11 @@ class ResponseToken(BaseModel):
 class TokenRefresh(BaseModel):
     token: str
 
+class User_Types(str, Enum):
+    ADMIN = "ADMIN"
+    cashier = "cashier"
+    logistic = "logistic"
+
 class ResponseUser(BaseModel):
     ID: int
     Name: str
@@ -30,15 +35,9 @@ class User(BaseModel):
     username: str
     pw: str
 
-class User_Types(str, Enum):
-    ADMIN = "ADMIN"
-    cashier = "cashier"
-    logistic = "logistic"
-
-
 class ModelResponseUser(BaseModel):
     Name: str = Field(min_length=1, max_length=100)
-    DateCreation: str = Field(min_length=1, max_length=150)
+    DateCreation: None | str = Field(min_length=1, max_length=150)
     UserType: User_Types
 
 class ModelResponseMe(ModelResponseUser):
@@ -52,26 +51,29 @@ class BaseUser(ModelResponseUser):
 
 class AdminUser(BaseUser):
     UserType: Literal["ADMIN"]
-    IDUser: int = Field(ge=1)
+    IDUser: int = Field(ge=1, le=10000000000000000000000000000000000)
 
 class CashierUser(BaseUser):
     UserType: Literal["cashier"]
-    IDUser: int = Field(ge=1)
-    PhoneNumber: int = Field(ge=1)
-    DDDNumber: int = Field(ge=1)
+    IDUser: int = Field(ge=1, le=10000000000000000000000000000000000)
+    PhoneNumber: int = Field(ge=1, le=10000000000000000000000000000000000)
+    DDDNumber: int = Field(ge=1, le=10000000000000000000000000000000000)
     WorkPosition: str = Field(min_length=1, max_length=100)
     LeaderEmail: EmailStr = Field(min_length=1, max_length=100)
 
 class LogisticUser(BaseUser):
     UserType: Literal["logistic"]
-    IDUser: int = Field(ge=1)
-    PhoneNumber: int = Field(ge=1)
-    DDDNumber: int = Field(ge=1)
+    IDUser: int = Field(ge=1, le=10000000000000000000000000000000000)
+    PhoneNumber: int = Field(ge=1, le=10000000000000000000000000000000000)
+    DDDNumber: int = Field(ge=1, le=10000000000000000000000000000000000)
     WorkPosition: str = Field(min_length=1, max_length=100)
     LeaderEmail: EmailStr = Field(min_length=1, max_length=100)
 
 class PostUser(BaseModel):
     User: Union[AdminUser, CashierUser, LogisticUser] = Field(discriminator="UserType")
+
+class PatchUser(PostUser):
+    ResetPassword: bool
 
 class GetUsers(ModelResponseUser):
     Limit: int = Field(gt=0, le=100)
@@ -87,6 +89,9 @@ class ResponseGetUsers(BaseModel):
     Limit: int = Field(gt=0, le=100)
     Offset: int = Field(ge=0)
 
+class ResponseGetUser(BaseModel):
+    User: Union[AdminUser, CashierUser, LogisticUser] = Field(discriminator="UserType")
+
 class Groups_Types(BaseModel):
     GroupName: str = Field(min_length=1, max_length=100)
     GroupDescription: str = Field(min_length=1, max_length=150)
@@ -95,6 +100,13 @@ class Group(BaseModel):
     ID: int
     GroupName: str
     GroupDescription: str
+    IDUserCreatedBy: str
+
+class Permission(BaseModel):
+    ID: int
+    PermissionName: str
+    PermissionType: str
+    PermissionDetails: str
     IDUserCreatedBy: str
 
 class ResponseGetGroup(BaseModel):
@@ -106,14 +118,28 @@ class UsersInGroup(Group):
 class PostUsersInGroup(BaseModel):
     groups: list[UsersInGroup]
 
+class ResponseGetPermission(BaseModel):
+    Permissions: list[Permission]
+
+class GetPermission(BaseModel):
+    Limit: int = Field(gt=0, le=100)
+    Offset: int = Field(ge=0)
+    OrderBy: Literal["ID", "GroupName", "IDUserCreatedBy"] = "ID"
+    idPermission: None | int = Field(None, ge=1)
+    PermissionType: str | None = Field(default=None, min_length=1, max_length=100)
+    PermissionName: str | None = Field(default=None, min_length=1, max_length=100)
+
 class GetGroup(BaseModel):
-    limit: int = Field(gt=0, le=100)
-    offset: int = Field(ge=0)
-    order_by: Literal["ID", "GroupName", "IDUserCreatedBy"] = "ID"
-    id_group: None | int = Field(None, ge=1)
+    Limit: int = Field(gt=0, le=100)
+    Offset: int = Field(ge=0)
+    OrderBy: Literal["ID", "GroupName", "IDUserCreatedBy"] = "ID"
+    idGroup: None | int = Field(None, ge=1)
     GroupName: str | None = Field(default=None, min_length=1, max_length=100)
 
-
+class GetMetaGroupUsers(BaseModel):
+    Limit: int = Field(gt=0, le=100)
+    Offset: int = Field(ge=0)
+    OrderBy: Literal["ID", "GroupName", "IDUserCreatedBy"] = "ID"
 
 class Products_Types(BaseModel):
     Name: str = Field(min_length=1, max_length=100)

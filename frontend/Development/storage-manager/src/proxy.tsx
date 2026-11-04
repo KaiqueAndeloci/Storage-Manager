@@ -1,6 +1,6 @@
 'use server'
 import { NextRequest, NextResponse } from 'next/server';
-import routes from '@/app/routes'
+import { routes } from '@/app/routes'
 
 
 export function proxy(request: NextRequest) {

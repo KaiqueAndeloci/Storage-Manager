@@ -56,7 +56,7 @@ def find_user_in_group(ID_user: int):
 
 # edit group
 @router.post("", response_model=int | None)
-async def post_group(group: Groups_Types, credentials: HTTPAuthorizationCredentials = Depends(security)):
+async def post_groups(group: Groups_Types, credentials: HTTPAuthorizationCredentials = Depends(security)):
     try:
         users = verify_token(credentials.credentials)
         if users == None:
@@ -83,7 +83,7 @@ async def post_group(group: Groups_Types, credentials: HTTPAuthorizationCredenti
         return JSONResponse(content={"message": "Bad request"}, status_code=500)
 
 @router.get("", response_model=ResponseGetGroup | None)
-async def get_group(filter_query: Annotated[GetGroup, Query()], credentials: HTTPAuthorizationCredentials = Depends(security)):
+async def get_groups(filter_query: Annotated[GetGroup, Query()], credentials: HTTPAuthorizationCredentials = Depends(security)):
     try:
         users = verify_token(credentials.credentials)
         if users == None:
@@ -100,11 +100,11 @@ async def get_group(filter_query: Annotated[GetGroup, Query()], credentials: HTT
         groups = []
 
         filter1 = []
-        filter2 = f"ORDER BY {filter_query.order_by} ASC LIMIT {filter_query.limit} OFFSET {filter_query.offset}"
+        filter2 = f"ORDER BY {filter_query.OrderBy} ASC LIMIT {filter_query.Limit} OFFSET {filter_query.Offset}"
         filter3 = ""
 
-        if filter_query.id_group != None:
-            filter1.append(f"ID = {filter_query.id_group}")
+        if filter_query.idGroup != None:
+            filter1.append(f"ID = {filter_query.idGroup}")
 
         if filter_query.GroupName != None:
             filter1.append(f"Group_name = '{filter_query.GroupName}'")
@@ -142,7 +142,7 @@ async def get_group(filter_query: Annotated[GetGroup, Query()], credentials: HTT
         return JSONResponse(content={"message": "Bad request"}, status_code=500)
 
 @router.patch("/{id_group}", response_model=int | None)
-async def patch_group(id_group: int, group: Groups_Types, credentials: HTTPAuthorizationCredentials = Depends(security)):
+async def patch_groups(id_group: int, group: Groups_Types, credentials: HTTPAuthorizationCredentials = Depends(security)):
     try:
         users = verify_token(credentials.credentials)
         if users == None:
@@ -170,7 +170,7 @@ async def patch_group(id_group: int, group: Groups_Types, credentials: HTTPAutho
         return JSONResponse(content={"message": "Bad request"}, status_code=500)
 
 @router.delete("/{id_group}", response_model=bool)
-async def delete_group(id_group: int, group: Groups_Types, credentials: HTTPAuthorizationCredentials = Depends(security)):
+async def delete_groups(id_group: int, group: Groups_Types, credentials: HTTPAuthorizationCredentials = Depends(security)):
     try:
         users = verify_token(credentials.credentials)
         if users == None:
@@ -262,9 +262,60 @@ async def patch_group_permissions():
     return JSONResponse(content={"message": "Bad request"}, status_code=500)
 
 # get permissions on the group
-@router.get("/permissions")
-async def get_group_permissions():
-    return JSONResponse(content={"message": "Bad request"}, status_code=500)
+# @router.get("/permissions")
+# async def get_group_permissions(filter_query: Annotated[GetMetaGroupUsers, Query()], credentials: HTTPAuthorizationCredentials = Depends(security)):
+#     try:
+#         users = verify_token(credentials.credentials)
+#         if users == None:
+#             users = []
+
+#         if len(users) == 0:
+#             return JSONResponse(content={"message": "Bad request"}, status_code=400)
+
+#         permission = verify_permission(credentials.credentials, 'READ', 'Permissions_Group')
+
+#         if permission == False:
+#             return JSONResponse(content={"message": "Unauthorized"}, status_code=401)
+
+#         filter1 = []
+#         filter2 = f"ORDER BY {filter_query.OrderBy} ASC LIMIT {filter_query.Limit} OFFSET {filter_query.Offset}"
+#         filter3 = ""
+
+#         if filter_query.idUser != None:
+#             filter1.append(f"ID_user = {filter_query.idUser}")
+
+#         if filter_query.idGroup != None:
+#             filter1.append(f"ID_group = {filter_query.idGroup}")
+
+#         if len(filter1) > 0:
+#             filter3 = f" WHERE "
+
+#             for index, filter in enumerate(filter1):
+#                 if index > 0:
+#                     filter3 += f" And "
+
+#                 filter3 += f"{filter}"
+
+#         users_group = db.Read("Meta_Group_Users", 
+#                             "ID, ID_user, ID_group, ID_user_added_by", 
+#                             f"{filter3} {filter2}")
+#         total = db.Read("Meta_Group_Users", "COUNT(*)", f"{filter3}")
+
+#         if users == None:
+#             users = []
+#             response = {
+#                 "Users": users_group,
+#                 "Total": total,
+#                 "Limit": int(filter_query.Limit),
+#                 "Offset": int(filter_query.Offset),
+#             }
+#             return JSONResponse(content=response, status_code=200)
+
+#         return JSONResponse(content={"message": "Bad request"}, status_code=500)
+#     except Exception as error:
+#         print(error)
+#         return JSONResponse(content={"message": "Bad request"}, status_code=500)
+    
 
 # remove permissions on group
 @router.delete("/permissions")

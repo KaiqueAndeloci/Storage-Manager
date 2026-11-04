@@ -1,7 +1,5 @@
 'use server'
-// import { LoginForm } from "@/components/custom/forms/login"
 import { Suspense } from "react";
-// import { Suspense, use, useState } from "react";
 import Loading from '@/app/loading'
 import { getUsersAction } from '@/requests/API_backend/index'
 import { TableActions } from '@/components/custom/tables/managememt/index'
@@ -23,9 +21,7 @@ export default async function Management({
     // const [Limit, setLimit] = useState(100);
     // const [Offset, setOffset] = useState(0);
     const params = await searchParams;
-
-
-    const Limit = Number(params.Limit || 1);
+    const Limit = Number(params.Limit || 10);
     const Offset = Number(params.Offset || 0);
     // const Limit = Number(params.get('Limit')) || 100
     // const Offset = Number(params.get('Offset')) || 0
@@ -33,13 +29,13 @@ export default async function Management({
     let response = await getUsersAction({ Limit: Limit, Offset: Offset })
     let users: Users_table[] = []
     let total = 0;
-    console.log(response)
+
     if (response.success === true) {
         for (let index = 0; index < response.response_api.Users.length; index++) {
             users.push(
                 {
                     checked: false,
-                    ID: index,
+                    ID: response.response_api.Users[index].ID,
                     Name: response.response_api.Users[index].Name,
                     DateCreation: response.response_api.Users[index].DateCreation,
                     UserType: response.response_api.Users[index].UserType

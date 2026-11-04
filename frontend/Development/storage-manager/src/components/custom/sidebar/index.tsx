@@ -1,5 +1,5 @@
 import { Calendar, Home, Inbox, Menu, Search, Settings, ChartPie } from "lucide-react"
-import routes from "@/app/routes"
+import { routes } from "@/app/routes"
 import {
     Sidebar,
     SidebarContent,

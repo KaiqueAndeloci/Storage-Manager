@@ -2,6 +2,7 @@ from Routes.Authentication import index as authentication
 from Routes.Users import index as users
 from Routes.Products import index as products
 from Routes.Groups import index as groups
+from Routes.Permissions import index as permissions
 from typing import Union
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
@@ -28,7 +29,7 @@ app.include_router(authentication.router)
 app.include_router(users.router)
 app.include_router(products.router)
 app.include_router(groups.router)
-
+app.include_router(permissions.router)
 
 
 if CREATE_ROOT == 'True':
