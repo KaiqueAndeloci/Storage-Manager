@@ -55,3 +55,6 @@ frontend/Development/storage-manager/*.tsbuildinfo
 frontend/Development/storage-manager/next-env.d.ts
 
 frontend/Development/storage-manager/dev_commands.txt
+
+# planning
+Planning/*
